@@ -14,7 +14,6 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--main", "README.markdown"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{lighthouse}
-  s.rubygems_version = %q{1.2.0}
   s.summary = %q{RubyGem wrapper for ActiveResource API to http://lighthouseapp.com}
   s.test_files = []
 
