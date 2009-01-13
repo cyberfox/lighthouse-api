@@ -159,16 +159,37 @@ module Lighthouse
     def changesets(options = {})
       Changeset.find(:all, :params => options.update(:project_id => id))
     end
+
+    def memberships(options = {})
+      ProjectMembership.find(:all, :params => options.update(:project_id => id))
+    end
+
+    def tags(options = {})
+      TagResource.find(:all, :params => options.update(:project_id => id))
+    end
   end
 
   class User < Base
-    def memberships
+    def memberships(options = {})
       Membership.find(:all, :params => {:user_id => id})
     end
   end
   
   class Membership < Base
     site_format << '/users/:user_id'
+    def save
+      raise Error, "Cannot modify memberships from the API"
+    end
+  end
+  
+  class ProjectMembership < Base
+    self.element_name = 'membership'
+    site_format << '/projects/:project_id'
+
+    def url
+      respond_to?(:account) ? account : project
+    end
+
     def save
       raise Error, "Cannot modify memberships from the API"
     end
@@ -306,13 +327,34 @@ module Lighthouse
   
   class Change < Array; end
 
+  class TagResource < Base
+    self.element_name = 'tag'
+    site_format << '/projects/:project_id'
+
+    def name
+      @name ||= Tag.new(attributes['name'], prefix_options[:project_id])
+    end
+
+    def tickets(options = {})
+      name.tickets(options)
+    end
+  end
+  
   class Tag < String
     attr_writer :prefix_options
+    attr_accessor :project_id
+
+    def initialize(s, project_id)
+      @project_id = project_id
+      super(s)
+    end
+
     def prefix_options
       @prefix_options || {}
     end
 
     def tickets(options = {})
+      options[:project_id] ||= @project_id
       Ticket.find(:all, :params => options.merge(prefix_options).update(:q => %{tagged:"#{self}"}))
     end
   end
