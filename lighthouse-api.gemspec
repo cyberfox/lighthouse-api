@@ -19,5 +19,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency(%q<activesupport>, [">= 2.1.0"])
   s.add_dependency(%q<activeresource>, [">= 2.1.0"])
+  s.add_dependency(%q<addressable>, [">= 0"])
   
 end
